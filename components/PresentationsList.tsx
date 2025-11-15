@@ -70,16 +70,16 @@ export default function PresentationsList({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 border border-rose-200">
-        <p className="text-gray-600 text-center">Loading presentations...</p>
+      <div className="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+        <p className="text-gray-400 text-center">Loading presentations...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 rounded-lg shadow-md p-6 border border-red-200">
-        <p className="text-red-600 text-center">{error}</p>
+      <div className="bg-red-900/20 rounded-lg shadow-md p-6 border border-red-900/30">
+        <p className="text-red-400 text-center">{error}</p>
         <button
           onClick={loadPresentations}
           className="mt-4 w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
@@ -92,8 +92,8 @@ export default function PresentationsList({
 
   if (presentations.length === 0) {
     return (
-      <div className="bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg shadow-md p-6 border border-rose-200">
-        <p className="text-gray-600 text-center">
+      <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg shadow-md p-6 border border-gray-700">
+        <p className="text-gray-400 text-center">
           No saved presentations yet. Create and save one to see it here!
         </p>
       </div>
@@ -102,16 +102,16 @@ export default function PresentationsList({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Saved Presentations</h2>
+      <h2 className="text-2xl font-bold text-white mb-4">Saved Presentations</h2>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {presentations.map((presentation) => (
           <div
             key={presentation.id}
-            className="bg-white rounded-lg shadow-md border border-rose-200 overflow-hidden hover:shadow-lg transition-shadow"
+            className="bg-gray-800 rounded-lg shadow-md border border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
           >
             {/* Preview Image */}
-            <div className="w-full h-32 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+            <div className="w-full h-32 bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center overflow-hidden">
               {presentation.slides && presentation.slides[0]?.image ? (
                 <img
                   src={presentation.slides[0].image}
@@ -127,10 +127,10 @@ export default function PresentationsList({
 
             {/* Content */}
             <div className="p-4">
-              <h3 className="font-bold text-gray-800 truncate mb-1">
+              <h3 className="font-bold text-white truncate mb-1">
                 {presentation.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-2">
+              <p className="text-sm text-gray-400 mb-2">
                 {presentation.slides?.length || 0} slides
               </p>
               <p className="text-xs text-gray-500 mb-4">

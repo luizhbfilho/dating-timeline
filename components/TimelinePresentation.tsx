@@ -2,11 +2,24 @@
 
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import QuizDisplay from "./QuizDisplay";
+
+interface QuizAnswer {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+}
+
+interface Quiz {
+  question: string;
+  answers: QuizAnswer[];
+}
 
 interface TimelineSlide {
   id: string;
   image: string;
   phrase: string;
+  quiz?: Quiz;
 }
 
 interface TimelinePresentationProps {
@@ -65,6 +78,7 @@ export default function TimelinePresentation({
     }
   };
 
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "ArrowUp") {
@@ -97,9 +111,9 @@ export default function TimelinePresentation({
             <img
               src={slide.image}
               alt={`Slide ${currentSlide + 1}`}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
+              className={`w-full h-full object-cover transition-all duration-300 ${
                 isTransitioning ? "opacity-50" : "opacity-100"
-              }`}
+              } ${slide.quiz ? "blur-sm" : ""}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-black">
@@ -108,13 +122,17 @@ export default function TimelinePresentation({
           )}
 
           {/* Overlay Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+          <div className={`absolute inset-0 ${
+            slide.quiz 
+              ? "bg-gradient-to-t from-black/80 via-black/40 to-black/20" 
+              : "bg-gradient-to-t from-black via-transparent to-transparent"
+          }`} />
         </div>
 
         {/* Content Overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-between p-6 pointer-events-none">
-          {/* Top - Exit Button */}
-          <div className="flex justify-between items-center w-full pointer-events-auto">
+          {/* Top - Exit Button (Always on top) */}
+          <div className="relative z-50 flex justify-between items-center w-full pointer-events-auto">
             <div />
             <button
               onClick={onExit}
@@ -125,17 +143,29 @@ export default function TimelinePresentation({
             </button>
           </div>
 
-          {/* Bottom - Text (Scrollable) */}
-          <div className="w-full flex flex-col items-center justify-end pb-12 pointer-events-auto">
-            <div className="w-full max-h-64 overflow-y-auto px-6 flex flex-col items-center">
-              {/* Phrase */}
-              <div className="text-center max-w-3xl">
-                <p className="text-2xl sm:text-4xl font-serif text-white leading-relaxed drop-shadow-lg text-justify whitespace-pre-wrap">
-                  {slide.phrase || ""}
-                </p>
+          {/* Bottom - Content */}
+          {slide.quiz ? (
+            // Quiz centered on screen
+            <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto">
+              <div className="w-full max-w-2xl">
+                <QuizDisplay 
+                  quiz={slide.quiz}
+                />
               </div>
             </div>
-          </div>
+          ) : (
+            // Phrase at bottom
+            <div className="w-full flex flex-col items-center justify-end pb-12 pointer-events-auto">
+              <div className="w-full max-h-64 overflow-y-auto px-6 flex flex-col items-center">
+                {/* Phrase */}
+                <div className="text-center max-w-3xl">
+                  <p className="text-2xl sm:text-4xl font-serif text-white leading-relaxed drop-shadow-lg text-justify whitespace-pre-wrap">
+                    {slide.phrase || ""}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </main>
