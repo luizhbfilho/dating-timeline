@@ -9,7 +9,7 @@ import {
   doc,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { getDb } from "./firebase";
 
 export interface TimelineSlide {
   id: string;
@@ -64,7 +64,8 @@ export const savePresentation = async (
   slides: TimelineSlide[]
 ): Promise<string> => {
   try {
-    if (!db) {
+    const database = getDb();
+    if (!database) {
       throw new Error("Firebase is not initialized. Please check your .env.local file.");
     }
 
@@ -85,7 +86,7 @@ export const savePresentation = async (
     };
 
     const docRef = await addDoc(
-      collection(db, PRESENTATIONS_COLLECTION),
+      collection(database, PRESENTATIONS_COLLECTION),
       presentation
     );
     console.log("Presentation saved successfully:", docRef.id);
@@ -103,8 +104,9 @@ export const savePresentation = async (
  */
 export const getAllPresentations = async (): Promise<Presentation[]> => {
   try {
+    const database = getDb();
     const querySnapshot = await getDocs(
-      collection(db, PRESENTATIONS_COLLECTION)
+      collection(database, PRESENTATIONS_COLLECTION)
     );
     const presentations: Presentation[] = [];
 
@@ -129,7 +131,8 @@ export const getPresentationById = async (
   id: string
 ): Promise<Presentation | null> => {
   try {
-    const docSnap = await getDocs(collection(db, PRESENTATIONS_COLLECTION));
+    const database = getDb();
+    const docSnap = await getDocs(collection(database, PRESENTATIONS_COLLECTION));
 
     for (const document of docSnap.docs) {
       if (document.id === id) {
@@ -156,7 +159,8 @@ export const updatePresentation = async (
   slides: TimelineSlide[]
 ): Promise<void> => {
   try {
-    const docRef = doc(db, PRESENTATIONS_COLLECTION, id);
+    const database = getDb();
+    const docRef = doc(database, PRESENTATIONS_COLLECTION, id);
     await updateDoc(docRef, {
       title,
       slides,
@@ -173,7 +177,8 @@ export const updatePresentation = async (
  */
 export const deletePresentation = async (id: string): Promise<void> => {
   try {
-    const docRef = doc(db, PRESENTATIONS_COLLECTION, id);
+    const database = getDb();
+    const docRef = doc(database, PRESENTATIONS_COLLECTION, id);
     await deleteDoc(docRef);
   } catch (error) {
     console.error("Error deleting presentation:", error);
