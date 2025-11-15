@@ -11,10 +11,23 @@ import {
 } from "firebase/firestore";
 import { getDb } from "./firebase";
 
+export interface QuizAnswer {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+}
+
+export interface Quiz {
+  question: string;
+  answers: QuizAnswer[];
+  correctMessage?: string;
+}
+
 export interface TimelineSlide {
   id: string;
   image: string;
   phrase: string;
+  quiz?: Quiz;
 }
 
 export interface Presentation {
@@ -69,12 +82,30 @@ export const savePresentation = async (
       throw new Error("Firebase is not initialized. Please check your .env.local file.");
     }
 
-    // Compress images to reduce file size
+    // Compress images and serialize quiz data to reduce file size
     const compressedSlides = await Promise.all(
-      slides.map(async (slide) => ({
-        ...slide,
-        image: slide.image ? await compressImage(slide.image) : "",
-      }))
+      slides.map(async (slide) => {
+        const serializedSlide: any = {
+          id: slide.id,
+          phrase: slide.phrase || "",
+          image: slide.image ? await compressImage(slide.image) : "",
+        };
+
+        // Serialize quiz data if present
+        if (slide.quiz) {
+          serializedSlide.quiz = {
+            question: slide.quiz.question || "",
+            correctMessage: slide.quiz.correctMessage || "✓ Correct!",
+            answers: (slide.quiz.answers || []).map((answer: QuizAnswer) => ({
+              id: answer.id || "",
+              text: answer.text || "",
+              isCorrect: answer.isCorrect === true,
+            })),
+          };
+        }
+
+        return serializedSlide;
+      })
     );
 
     const now = new Date();
