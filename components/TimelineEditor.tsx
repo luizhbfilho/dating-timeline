@@ -38,7 +38,7 @@ export default function TimelineEditor({
         <div className="inline-block p-8 bg-white rounded-2xl shadow-md border-2 border-dashed border-rose-200">
           <p className="text-gray-500 text-lg mb-2">No slides yet</p>
           <p className="text-gray-400 text-sm">
-            Click "Add Slide" to create your first timeline slide
+            Click &quot;Add Slide&quot; to create your first timeline slide
           </p>
         </div>
       </div>
