@@ -43,6 +43,7 @@ const PRESENTATIONS_COLLECTION = "presentations";
 
 /**
  * Compress image to reduce file size
+ * Optimized for web: reduces dimensions and quality for faster loading
  */
 const compressImage = async (base64Image: string): Promise<string> => {
   return new Promise((resolve) => {
@@ -52,14 +53,31 @@ const compressImage = async (base64Image: string): Promise<string> => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       
-      // Reduce dimensions to 50% to save space
-      canvas.width = img.width * 0.5;
-      canvas.height = img.height * 0.5;
+      // Calculate optimal dimensions (max 1920px width for web)
+      let width = img.width;
+      let height = img.height;
+      const maxWidth = 1920;
+      const maxHeight = 1080;
+      
+      if (width > maxWidth || height > maxHeight) {
+        const aspectRatio = width / height;
+        if (width > maxWidth) {
+          width = maxWidth;
+          height = Math.round(width / aspectRatio);
+        }
+        if (height > maxHeight) {
+          height = maxHeight;
+          width = Math.round(height * aspectRatio);
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
       
       ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
       
-      // Convert to JPEG with lower quality
-      const compressed = canvas.toDataURL("image/jpeg", 0.6);
+      // Convert to JPEG with optimized quality (0.5 for smaller size, 0.7 for better quality)
+      const compressed = canvas.toDataURL("image/jpeg", 0.65);
       resolve(compressed);
     };
     img.onerror = () => {

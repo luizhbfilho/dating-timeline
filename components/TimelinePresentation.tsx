@@ -40,6 +40,7 @@ export default function TimelinePresentation({
   const touchStartX = useRef(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
@@ -103,6 +104,11 @@ export default function TimelinePresentation({
 
 
   useEffect(() => {
+    // Reset image loaded state when slide changes
+    setImageLoaded(false);
+  }, [currentSlide]);
+
+  useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "ArrowUp") {
         e.preventDefault();
@@ -131,26 +137,37 @@ export default function TimelinePresentation({
         {/* Image - Full Screen */}
         <div className="absolute inset-0 w-full h-full">
           {slide.image ? (
-            <img
-              src={slide.image}
-              alt={`Slide ${currentSlide + 1}`}
-              className={`w-full h-full object-cover transition-all duration-300 ${
-                isTransitioning ? "opacity-50" : "opacity-100"
-              } ${slide.quiz ? "blur-sm" : ""}`}
-            />
+            <>
+              {/* Loading skeleton */}
+              {!imageLoaded && (
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 animate-pulse" />
+              )}
+              {/* Actual image */}
+              <img
+                src={slide.image}
+                alt={`Slide ${currentSlide + 1}`}
+                onLoad={() => setImageLoaded(true)}
+                loading="lazy"
+                className={`w-full h-full object-cover transition-all duration-300 ${
+                  isTransitioning ? "opacity-50" : "opacity-100"
+                } ${slide.quiz ? "blur-sm" : ""} ${
+                  !imageLoaded ? "opacity-0" : "opacity-100"
+                }`}
+              />
+            </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-black">
-              <span className="text-gray-500 text-lg">No image</span>
+            <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+              <p className="text-gray-400 text-lg">No image</p>
             </div>
           )}
-
-          {/* Overlay Gradient */}
-          <div className={`absolute inset-0 ${
-            slide.quiz 
-              ? "bg-gradient-to-t from-black/80 via-black/40 to-black/20" 
-              : "bg-gradient-to-t from-black via-transparent to-transparent"
-          }`} />
         </div>
+
+        {/* Overlay Gradient */}
+        <div className={`absolute inset-0 ${
+          slide.quiz 
+            ? "bg-gradient-to-t from-black/80 via-black/40 to-black/20" 
+            : "bg-gradient-to-t from-black via-transparent to-transparent"
+        }`} />
 
         {/* Content Overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-between p-6 pointer-events-none">
