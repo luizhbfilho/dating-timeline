@@ -38,6 +38,7 @@ export default function TimelinePresentation({
   const slide = slides[currentSlide];
   const touchStartY = useRef(0);
   const touchStartX = useRef(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -50,6 +51,28 @@ export default function TimelinePresentation({
     const touchEndX = e.changedTouches[0].clientX;
     const deltaY = touchStartY.current - touchEndY;
     const deltaX = touchStartX.current - touchEndX;
+
+    // Check if user is scrolling within the text container
+    if (scrollContainerRef.current) {
+      const isScrollable = scrollContainerRef.current.scrollHeight > scrollContainerRef.current.clientHeight;
+      const isAtTop = scrollContainerRef.current.scrollTop === 0;
+      const isAtBottom = scrollContainerRef.current.scrollTop + scrollContainerRef.current.clientHeight >= scrollContainerRef.current.scrollHeight - 5;
+
+      // If content is scrollable and user is not at the edge, don't navigate
+      if (isScrollable && !isAtTop && !isAtBottom) {
+        return;
+      }
+
+      // If scrollable and swiping in the direction away from edge, don't navigate
+      if (isScrollable && !isAtTop && deltaY > 0) {
+        // Trying to scroll down but not at bottom
+        return;
+      }
+      if (isScrollable && !isAtBottom && deltaY < 0) {
+        // Trying to scroll up but not at top
+        return;
+      }
+    }
 
     // Swipe up/down threshold
     const threshold = 50;
@@ -156,7 +179,7 @@ export default function TimelinePresentation({
           ) : (
             // Phrase at bottom
             <div className="w-full flex flex-col items-center justify-end pb-12 pointer-events-auto">
-              <div className="w-full max-h-64 overflow-y-auto px-6 flex flex-col items-center">
+              <div ref={scrollContainerRef} className="w-full max-h-64 overflow-y-auto px-6 flex flex-col items-center">
                 {/* Phrase */}
                 <div className="text-center max-w-3xl">
                   <p className="text-2xl sm:text-4xl font-serif text-white leading-relaxed drop-shadow-lg text-center whitespace-pre-wrap">
