@@ -159,7 +159,7 @@ export default function TimelinePresentation({
               <div className="w-full max-h-64 overflow-y-auto px-6 flex flex-col items-center">
                 {/* Phrase */}
                 <div className="text-center max-w-3xl">
-                  <p className="text-2xl sm:text-4xl font-serif text-white leading-relaxed drop-shadow-lg text-justify whitespace-pre-wrap">
+                  <p className="text-2xl sm:text-4xl font-serif text-white leading-relaxed drop-shadow-lg text-center whitespace-pre-wrap">
                     {slide.phrase || ""}
                   </p>
                 </div>
